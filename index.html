@@ -472,6 +472,38 @@ body::before{
 }
 .grint-step-text{font-size:12px;color:var(--t2);line-height:1.5}
 .grint-step-text strong{color:var(--text);display:block;margin-bottom:2px}
+
+/* ── SCORECARD GRID (responsive) ─────────────────────────── */
+.scorecard-hdr{
+  display:grid;grid-template-columns:28px 1fr 50px 42px 56px;
+  padding:7px 12px;background:var(--bg3);border-bottom:1px solid var(--border);
+  font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase;
+}
+.scorecard-row{
+  display:grid;grid-template-columns:28px 1fr 50px 42px 56px;
+  padding:9px 12px;border-bottom:1px solid var(--border);align-items:center;
+}
+.modal-round-hdr{
+  display:grid;grid-template-columns:50px 1fr 46px 38px 62px;
+  padding:7px 14px;background:var(--bg4);border-bottom:1px solid var(--border);
+  font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase;
+}
+.modal-round-row{
+  display:grid;grid-template-columns:50px 1fr 46px 38px 62px;
+  padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;gap:4px;
+}
+
+/* ── MOBILE TOUCH & RESPONSIVE ───────────────────────────── */
+.bnav-item{min-height:44px;justify-content:center}
+
+@media(max-width:374px){
+  .lb-hdr,.lb-row{grid-template-columns:24px 1fr 56px 40px}
+  .pts-r,.lb-col-rnd{display:none}
+  .scorecard-hdr,.scorecard-row{grid-template-columns:24px 1fr 46px 52px}
+  .scorecard-rank{display:none}
+  .modal-round-hdr,.modal-round-row{grid-template-columns:40px 1fr 42px 56px}
+  .modal-round-rank{display:none}
+}
 </style>
 </head>
 <body>
@@ -507,7 +539,7 @@ body::before{
   <div class="lb-wrap">
     <div class="lb-hdr">
       <div>#</div><div>Player</div>
-      <div style="text-align:right">Rnd Pts</div>
+      <div class="lb-col-rnd" style="text-align:right">Rnd Pts</div>
       <div style="text-align:right">Total</div>
       <div style="text-align:right">Gap</div>
     </div>
@@ -523,7 +555,7 @@ body::before{
   <div class="lb-wrap">
     <div class="lb-hdr">
       <div>#</div><div>Player</div>
-      <div style="text-align:right">Rnd Pts</div>
+      <div class="lb-col-rnd" style="text-align:right">Rnd Pts</div>
       <div style="text-align:right">Total</div>
       <div style="text-align:right">Gap</div>
     </div>
@@ -695,6 +727,7 @@ body::before{
   <button class="bnav-item"    onclick="nav('ryder',this,'b')"     id="b-ryder">    <span class="bnav-icon">⚔️</span>Ryder</button>
   <button class="bnav-item"    onclick="nav('rounds',this,'b')"    id="b-rounds">   <span class="bnav-icon">📊</span>Rounds</button>
   <button class="bnav-item"    onclick="nav('players',this,'b')"   id="b-players">  <span class="bnav-icon">👤</span>Players</button>
+  <button class="bnav-item"    onclick="nav('pots',this,'b')"      id="b-pots">     <span class="bnav-icon">💰</span>Pots</button>
   <button class="bnav-item"    onclick="nav('grint',this,'b')"     id="b-grint">    <span class="bnav-icon">🏌️</span>Grint</button>
 </nav>
 
@@ -1178,9 +1211,7 @@ function renderRounds() {
       const rowBg = pi === 0 ? 'rgba(200,150,12,.07)' : pi % 2 === 0 ? 'rgba(255,255,255,.02)' : 'transparent';
       const isCtpWinner = hasCTP && cleanName(c.winner) === cleanName(p.name);
       return `
-        <div style="display:grid;grid-template-columns:28px 1fr 50px 42px 56px;
-                    padding:9px 12px;border-bottom:1px solid var(--border);
-                    align-items:center;background:${rowBg}">
+        <div class="scorecard-row" style="background:${rowBg}">
           <div style="font-size:${pi < 3 ? 15 : 12}px;text-align:center">${medal}</div>
           <div>
             <span style="font-size:13px;font-weight:600">${cleanName(p.name)}</span>
@@ -1190,7 +1221,7 @@ function renderRounds() {
               border:1px solid rgba(192,132,252,.3);border-radius:3px;padding:1px 4px;margin-left:3px">⭐ CTP</span>` : ''}
           </div>
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-align:right">${p.net}</div>
-          <div style="font-size:10px;color:var(--t3);text-align:center">${p.rank ? '#' + p.rank : '—'}</div>
+          <div class="scorecard-rank" style="font-size:10px;color:var(--t3);text-align:center">${p.rank ? '#' + p.rank : '—'}</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);text-align:right">
             ${p.pts > 0 ? p.pts.toFixed(1) : '—'}
           </div>
@@ -1249,12 +1280,10 @@ function renderRounds() {
         </div>
         <!-- Expandable scorecard -->
         <div id="round-scores-${i}" style="display:none">
-          <div style="display:grid;grid-template-columns:28px 1fr 50px 42px 56px;
-                      padding:7px 12px;background:var(--bg3);border-bottom:1px solid var(--border);
-                      font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase">
+          <div class="scorecard-hdr">
             <div></div><div>Player</div>
             <div style="text-align:right">Net</div>
-            <div style="text-align:center">Rank</div>
+            <div class="scorecard-rank" style="text-align:center">Rank</div>
             <div style="text-align:right">Pts</div>
           </div>
           ${scoreRows}
@@ -1363,8 +1392,7 @@ function openPlayer(name) {
     const pts    = rndPts[i];
     const hasCTP = ctpRnds.includes(`R${i+1}`);
     return `
-      <div style="display:grid;grid-template-columns:50px 1fr 46px 38px 62px;
-                  padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;gap:4px">
+      <div class="modal-round-row">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--t2)">R${i+1}</div>
         <div>
           <div style="font-size:12px;font-weight:500">${courses[i]}</div>
@@ -1373,7 +1401,7 @@ function openPlayer(name) {
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-align:right">
           ${ns ? ns.net : '—'}
         </div>
-        <div style="font-size:10px;color:var(--t3);text-align:center">
+        <div class="modal-round-rank" style="font-size:10px;color:var(--t3);text-align:center">
           ${ns && ns.rank > 0 ? '#' + ns.rank : ''}
         </div>
         <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);text-align:right">
@@ -1393,12 +1421,10 @@ function openPlayer(name) {
     <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--t3);
                 text-transform:uppercase;margin-bottom:8px">ROUND BY ROUND</div>
     <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden">
-      <div style="display:grid;grid-template-columns:50px 1fr 46px 38px 62px;
-                  padding:7px 14px;background:var(--bg4);border-bottom:1px solid var(--border);
-                  font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase">
+      <div class="modal-round-hdr">
         <div>Round</div><div>Course</div>
         <div style="text-align:right">Net</div>
-        <div style="text-align:center">Rank</div>
+        <div class="modal-round-rank" style="text-align:center">Rank</div>
         <div style="text-align:right">Pts</div>
       </div>
       ${roundRows}
