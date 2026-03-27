@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Streamsong 2026 · Ryder Cup</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & ROOT ─────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --g:    #1A5E2A;
+  --g2:   #2A8040;
+  --gx:   #0D3318;
+  --gold: #C8960C;
+  --gold2:#F0B429;
+  --blue: #1E3A8A;
+  --bluex:#162C6B;
+  --red:  #7F1D1D;
+  --redx: #5C1111;
+  --bg:   #080C08;
+  --bg2:  #0F140F;
+  --bg3:  #161C16;
+  --bg4:  #1E261E;
+  --border:#2A362A;
+  --text: #ECE9E2;
+  --t2:   #9B9990;
+  --t3:   #5A5955;
+  --bluel:#DBEAFE;
+  --redl: #FEE2E2;
+}
+html{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;overflow-x:hidden}
+body{min-height:100vh;padding-bottom:72px}
+
+/* ── GRAIN TEXTURE ────────────────────────────────────────── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.4;
+}
+
+/* ── HEADER ───────────────────────────────────────────────── */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8,12,8,0.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+}
+.header-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px 0;
+}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-mark{
+  width:34px;height:34px;border-radius:8px;
+  background:linear-gradient(135deg,var(--g),var(--g2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;
+}
+.logo-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:19px;letter-spacing:1.5px;line-height:1;
+}
+.logo-text em{color:var(--gold);font-style:normal}
+.live-pill{
+  display:flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:20px;
+  background:rgba(200,150,12,.12);
+  border:1px solid rgba(200,150,12,.35);
+  font-size:10px;font-weight:700;color:var(--gold);
+  letter-spacing:.8px;
+}
+.live-dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--gold);
+  animation:blink 1.4s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── NAV ──────────────────────────────────────────────────── */
+.nav{
+  display:flex;overflow-x:auto;scrollbar-width:none;
+  padding:0 4px;
+}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{
+  flex-shrink:0;
+  padding:9px 14px 11px;
+  background:none;border:none;cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px;font-weight:700;letter-spacing:.6px;
+  color:var(--t3);text-transform:uppercase;
+  position:relative;transition:color .2s;white-space:nowrap;
+}
+.nav-btn.on{color:var(--gold)}
+.nav-btn.on::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;
+  height:2px;background:var(--gold);border-radius:1px;
+}
+
+/* ── BOTTOM NAV (mobile) ──────────────────────────────────── */
+.bnav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  background:rgba(8,12,8,.97);
+  backdrop-filter:blur(12px);
+  border-top:1px solid var(--border);
+  padding:6px 0 max(8px,env(safe-area-inset-bottom));
+}
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;gap:2px;
+  background:none;border:none;cursor:pointer;
+  font-size:9px;font-weight:700;letter-spacing:.4px;
+  color:var(--t3);text-transform:uppercase;
+  padding:3px 0;transition:color .15s;
+}
+.bnav-item.on{color:var(--gold)}
+.bnav-icon{font-size:19px;line-height:1}
+
+@media(max-width:640px){
+  .nav{display:none}
+  .bnav{display:flex}
+}
+
+/* ── PAGES ────────────────────────────────────────────────── */
+.page{display:none;padding:14px 14px 20px;position:relative;z-index:1}
+.page.on{display:block;animation:rise .22s ease}
+@keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* ── LOADING & ERROR ──────────────────────────────────────── */
+.loading{
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:60px 20px;gap:12px;
+  color:var(--t2);font-size:13px;
+}
+.spinner{
+  width:32px;height:32px;border-radius:50%;
+  border:2px solid var(--border);
+  border-top-color:var(--gold);
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── SECTION LABEL ────────────────────────────────────────── */
+.sec{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:2px;
+  color:var(--t3);text-transform:uppercase;
+  margin:18px 0 8px;
+}
+
+/* ── RYDER HERO ───────────────────────────────────────────── */
+.ryder-hero{
+  background:linear-gradient(135deg,var(--bg3),var(--bg4));
+  border:1px solid var(--border);
+  border-radius:16px;padding:18px 16px 14px;
+  position:relative;overflow:hidden;
+}
+.ryder-hero::after{
+  content:'⚔';position:absolute;right:14px;top:10px;
+  font-size:64px;opacity:.05;line-height:1;
+}
+.ryder-eyebrow{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:10px;font-weight:700;letter-spacing:2px;
+  color:var(--t3);text-transform:uppercase;margin-bottom:14px;
+}
+.score-row{
+  display:grid;grid-template-columns:1fr auto 1fr;
+  align-items:center;gap:8px;
+}
+.score-block{text-align:center}
+.team-tag{
+  font-size:10px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:3px;
+}
+.score-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:68px;line-height:1;letter-spacing:-2px;
+}
+.score-sub{font-size:10px;color:var(--t3);margin-top:2px}
+.vs-txt{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;color:var(--gold);
+}
+.ryder-banner{
+  margin-top:12px;
+  padding:8px 12px;
+  background:rgba(200,150,12,.1);
+  border:1px solid rgba(200,150,12,.25);
+  border-radius:8px;
+  font-size:12px;font-weight:600;
+  color:var(--gold);text-align:center;
+}
+
+/* ── ROUND PILLS ──────────────────────────────────────────── */
+.round-row{
+  display:flex;gap:8px;overflow-x:auto;
+  scrollbar-width:none;padding-bottom:2px;
+}
+.round-row::-webkit-scrollbar{display:none}
+.r-pill{
+  flex-shrink:0;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:10px 12px;width:110px;
+  cursor:pointer;transition:border-color .2s;
+}
+.r-pill.done{border-color:var(--g)}
+.r-pill.live{border-color:var(--gold)}
+.r-label{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;line-height:1;margin-bottom:3px;
+}
+.r-course{font-size:10px;color:var(--t2);margin-bottom:6px}
+.r-badge{
+  display:inline-block;padding:2px 7px;border-radius:20px;
+  font-size:9px;font-weight:700;letter-spacing:.3px;
+}
+.badge-done{background:rgba(26,94,42,.3);color:#6BE08A}
+.badge-live{background:rgba(200,150,12,.2);color:var(--gold)}
+.badge-pend{background:var(--bg4);color:var(--t3)}
+
+/* ── LEADERBOARD TABLE ────────────────────────────────────── */
+.lb-wrap{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+}
+.lb-hdr{
+  display:grid;grid-template-columns:30px 1fr 52px 60px 48px;
+  padding:9px 12px;
+  background:var(--bg3);
+  border-bottom:1px solid var(--border);
+  font-size:9px;font-weight:700;letter-spacing:1px;
+  color:var(--t3);text-transform:uppercase;
+}
+.lb-row{
+  display:grid;grid-template-columns:30px 1fr 52px 60px 48px;
+  padding:11px 12px;
+  border-bottom:1px solid var(--border);
+  align-items:center;
+  cursor:pointer;transition:background .12s;
+}
+.lb-row:last-child{border-bottom:none}
+.lb-row:active{background:var(--bg3)}
+.lb-row.top{background:rgba(200,150,12,.05)}
+.rank-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:20px;color:var(--t3);text-align:center;
+}
+.lb-row.top .rank-num{color:var(--gold)}
+.pname{font-size:14px;font-weight:600}
+.pmeta{
+  font-size:10px;color:var(--t3);
+  display:flex;align-items:center;gap:4px;margin-top:1px;
+}
+.pts-r{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px;font-weight:600;
+  color:var(--t2);text-align:right;
+}
+.pts-total{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;text-align:right;
+}
+.pbar{height:2px;background:var(--border);border-radius:1px;margin-top:3px;overflow:hidden}
+.pbar-fill{height:100%;border-radius:1px;background:linear-gradient(90deg,var(--g),var(--gold))}
+
+/* ── RYDER ROUND ROWS ─────────────────────────────────────── */
+.rr-wrap{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+}
+
+/* ── STAT CARD ────────────────────────────────────────────── */
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;margin-bottom:10px;
+}
+.stat-card-title{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;
+  color:var(--t3);text-transform:uppercase;margin-bottom:10px;
+}
+.stat-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 0;border-bottom:1px solid var(--border);
+}
+.stat-row:last-child{border-bottom:none}
+.stat-label{font-size:12px;color:var(--t2)}
+.stat-val{
+  font-size:13px;font-weight:700;
+  font-family:'Barlow Condensed',sans-serif;
+}
+.sv-gold{color:var(--gold)}
+.sv-green{color:#6BE08A}
+
+/* ── ROUND SCORE TABLE ────────────────────────────────────── */
+.rs-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;margin-bottom:12px;
+}
+.rs-hdr{
+  padding:12px 14px;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;
+}
+
+/* ── POT CARD ─────────────────────────────────────────────── */
+.pot-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:13px 14px;
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:8px;
+}
+.pot-icon{
+  width:42px;height:42px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+  background:rgba(200,150,12,.1);
+}
+.pot-info{flex:1;min-width:0}
+.pot-name{font-size:13px;font-weight:600}
+.pot-desc{font-size:10px;color:var(--t3);margin-top:2px}
+.pot-right{text-align:right;flex-shrink:0}
+.pot-amt{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:24px;color:var(--gold);line-height:1;
+}
+.pot-status{font-size:9px;color:var(--t3)}
+
+/* ── PLAYER MODAL ─────────────────────────────────────────── */
+.modal{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.8);backdrop-filter:blur(6px);
+}
+.modal.on{display:flex;align-items:flex-end}
+.modal-sheet{
+  background:var(--bg2);
+  border-radius:20px 20px 0 0;
+  border-top:1px solid var(--border);
+  width:100%;max-height:88vh;
+  overflow-y:auto;
+  padding:18px 16px 40px;
+  animation:slideup .28s cubic-bezier(.4,0,.2,1);
+}
+@keyframes slideup{from{transform:translateY(100%)}to{transform:none}}
+.modal-handle{
+  width:34px;height:4px;background:var(--border);
+  border-radius:2px;margin:0 auto 18px;
+}
+.modal-name{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:38px;line-height:1;margin-bottom:3px;
+}
+.modal-meta{font-size:12px;color:var(--t3);margin-bottom:18px}
+.modal-grid{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  gap:8px;margin-bottom:18px;
+}
+.mstat{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:10px;text-align:center;
+}
+.mstat-val{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;line-height:1;color:var(--gold);
+}
+.mstat-lbl{font-size:9px;color:var(--t3);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+/* ── HIO CARD ─────────────────────────────────────────────── */
+.hio-card{
+  background:linear-gradient(135deg,rgba(88,28,135,.25),rgba(26,94,42,.15));
+  border:1px solid rgba(88,28,135,.4);
+  border-radius:12px;padding:16px;margin-bottom:10px;
+}
+.hio-head{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;color:#C084FC;margin-bottom:4px;
+}
+.hio-pct{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:36px;color:#C084FC;line-height:1;
+}
+
+/* ── TEAM CARDS ───────────────────────────────────────────── */
+.team-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.team-card{border-radius:12px;padding:14px;}
+.tc-blue{background:rgba(30,58,138,.2);border:1px solid rgba(30,58,138,.4)}
+.tc-red {background:rgba(127,29,29,.2); border:1px solid rgba(127,29,29,.4)}
+.tc-name{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.tc-score{font-family:'Bebas Neue',sans-serif;font-size:42px;line-height:1;}
+.tc-blue .tc-score{color:#60A5FA}
+.tc-red  .tc-score{color:#F87171}
+.tc-label{font-size:9px;color:var(--t3);margin-top:2px}
+
+/* ── DATA NOTE ────────────────────────────────────────────── */
+.data-note{
+  font-size:10px;color:var(--t3);
+  text-align:center;padding:6px;
+  border:1px dashed var(--border);
+  border-radius:6px;margin-bottom:10px;
+}
+
+/* ── GRINT SECTION ────────────────────────────────────────── */
+.grint-hero{
+  background:linear-gradient(135deg,rgba(26,94,42,.3),rgba(14,60,28,.2));
+  border:1px solid rgba(26,94,42,.5);
+  border-radius:16px;padding:16px;margin-bottom:12px;
+}
+.grint-logo-row{
+  display:flex;align-items:center;gap:10px;margin-bottom:12px;
+}
+.grint-logo-mark{
+  width:42px;height:42px;border-radius:10px;
+  background:linear-gradient(135deg,#1A5E2A,#2A8040);
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.grint-logo-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px;line-height:1;
+}
+.grint-logo-sub{font-size:11px;color:var(--t2);margin-top:2px}
+.grint-url-input{
+  width:100%;background:var(--bg3);
+  border:1px solid var(--border);border-radius:8px;
+  padding:10px 12px;color:var(--text);font-size:13px;
+  font-family:'Barlow',sans-serif;outline:none;
+  transition:border-color .2s;
+}
+.grint-url-input:focus{border-color:var(--g2)}
+.grint-url-input::placeholder{color:var(--t3)}
+.grint-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:11px;border-radius:10px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:14px;font-weight:700;letter-spacing:.5px;
+  cursor:pointer;border:none;transition:opacity .15s;
+  text-decoration:none;
+}
+.grint-btn:active{opacity:.8}
+.grint-btn-primary{
+  background:linear-gradient(135deg,var(--g),var(--g2));
+  color:#fff;margin-top:8px;
+}
+.grint-btn-secondary{
+  background:var(--bg3);border:1px solid var(--border);
+  color:var(--t2);margin-top:6px;
+}
+.grint-iframe-wrap{
+  border-radius:12px;overflow:hidden;
+  border:1px solid var(--border);
+  margin-bottom:12px;background:var(--bg2);
+}
+.grint-iframe-wrap iframe{
+  width:100%;border:none;display:block;
+}
+.grint-info-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;margin-bottom:10px;
+}
+.grint-step{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:8px 0;border-bottom:1px solid var(--border);
+}
+.grint-step:last-child{border-bottom:none}
+.grint-step-num{
+  font-family:'Bebas Neue',sans-serif;font-size:20px;
+  color:var(--gold);line-height:1;flex-shrink:0;width:20px;
+}
+.grint-step-text{font-size:12px;color:var(--t2);line-height:1.5}
+.grint-step-text strong{color:var(--text);display:block;margin-bottom:2px}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────────────── -->
+<header class="header">
+  <div class="header-top">
+    <div class="logo">
+      <div class="logo-mark">⛳</div>
+      <div class="logo-text">STREAM<em>SONG</em> 2026</div>
+    </div>
+    <div class="live-pill"><div class="live-dot"></div>LIVE</div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn on" onclick="nav('home',this)">Home</button>
+    <button class="nav-btn"   onclick="nav('standings',this)">Standings</button>
+    <button class="nav-btn"   onclick="nav('ryder',this)">Ryder Cup</button>
+    <button class="nav-btn"   onclick="nav('rounds',this)">Rounds</button>
+    <button class="nav-btn"   onclick="nav('players',this)">Players</button>
+    <button class="nav-btn"   onclick="nav('pots',this)">Pots</button>
+    <button class="nav-btn"   onclick="nav('grint',this)">The Grint</button>
+  </nav>
+</header>
+
+<!-- ── PAGES ───────────────────────────────────────────────── -->
+
+<!-- HOME -->
+<div class="page on" id="pg-home">
+  <div id="home-ryder"></div>
+  <div class="sec">ROUNDS</div>
+  <div class="round-row" id="home-rounds"></div>
+  <div class="sec">TOP 3 — INDIVIDUAL</div>
+  <div class="lb-wrap">
+    <div class="lb-hdr">
+      <div>#</div><div>Player</div>
+      <div style="text-align:right">Rnd Pts</div>
+      <div style="text-align:right">Total</div>
+      <div style="text-align:right">Gap</div>
+    </div>
+    <div id="home-lb"></div>
+  </div>
+  <div class="sec">TODAY'S SPOTLIGHT</div>
+  <div class="stat-card" id="home-spotlight"></div>
+</div>
+
+<!-- STANDINGS -->
+<div class="page" id="pg-standings">
+  <div class="data-note" id="standings-note">Loading standings…</div>
+  <div class="lb-wrap">
+    <div class="lb-hdr">
+      <div>#</div><div>Player</div>
+      <div style="text-align:right">Rnd Pts</div>
+      <div style="text-align:right">Total</div>
+      <div style="text-align:right">Gap</div>
+    </div>
+    <div id="full-lb"></div>
+  </div>
+</div>
+
+<!-- RYDER CUP -->
+<div class="page" id="pg-ryder">
+  <div class="team-cards" id="ryder-teams"></div>
+  <div id="ryder-banner" style="margin-bottom:10px"></div>
+  <div class="sec">BY ROUND</div>
+  <div class="rr-wrap" id="ryder-rounds"></div>
+  <div class="sec">POINTS AVAILABLE</div>
+  <div class="stat-card">
+    <div class="stat-row"><span class="stat-label">R1 TPC — High-Low Cart</span><span class="stat-val sv-gold">3 pts</span></div>
+    <div class="stat-row"><span class="stat-label">R2 Black — Cart vs Cart</span><span class="stat-val sv-gold">6 pts</span></div>
+    <div class="stat-row"><span class="stat-label">R3 Chain — Four-Ball + CTP</span><span class="stat-val sv-gold">6 pts</span></div>
+    <div class="stat-row"><span class="stat-label">R4 Blue — Cart vs Cart</span><span class="stat-val sv-gold">9 pts</span></div>
+    <div class="stat-row"><span class="stat-label">R5 Red — Singles</span><span class="stat-val sv-gold">6 pts</span></div>
+    <div class="stat-row"><span class="stat-label" style="font-weight:700">TOTAL</span><span class="stat-val" style="font-size:18px;color:#6BE08A">30 pts</span></div>
+  </div>
+</div>
+
+<!-- ROUNDS -->
+<div class="page" id="pg-rounds">
+  <div id="rounds-content"></div>
+</div>
+
+<!-- PLAYERS -->
+<div class="page" id="pg-players">
+  <div class="sec">🔵 SLICE CHESTER CITY</div>
+  <div id="blue-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+  <div class="sec" style="margin-top:16px">🔴 CARMENCITAS</div>
+  <div id="red-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+</div>
+
+<!-- POTS -->
+<div class="page" id="pg-pots">
+  <div class="sec">THE 6 POTS</div>
+  <div id="pots-list"></div>
+  <div class="sec">DAILY POT WINNERS</div>
+  <div class="stat-card" id="daily-winners"></div>
+  <div class="sec">CTP WINNERS</div>
+  <div class="stat-card" id="ctp-winners"></div>
+  <div class="hio-card">
+    <div class="hio-head">🎱 HIO INSURANCE</div>
+    <div class="hio-pct">3.56%</div>
+    <div style="font-size:11px;color:var(--t3);margin-top:4px">Trip odds of a hole-in-one · $10/player · Pool goes to dinner if no HIO</div>
+    <div style="margin-top:8px;font-size:11px;color:#C084FC">The Chain (18 par-3s) = highest risk round</div>
+  </div>
+</div>
+
+<!-- THE GRINT -->
+<div class="page" id="pg-grint">
+  <div class="grint-hero">
+    <div class="grint-logo-row">
+      <div class="grint-logo-mark">⛳</div>
+      <div>
+        <div class="grint-logo-title">THE GRINT</div>
+        <div class="grint-logo-sub">Score Tracking · Handicaps · Leaderboards</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:12px;line-height:1.6">
+      Paste your Grint group or club link below to open it directly. Scores tracked in The Grint stay in sync with your handicap — enter your group URL once and bookmark this page.
+    </div>
+    <input id="grint-url" class="grint-url-input" type="url"
+      placeholder="https://www.thegrint.com/club/your-club-id"
+      oninput="saveGrintUrl(this.value)">
+    <a id="grint-open-btn" class="grint-btn grint-btn-primary" href="#" target="_blank" rel="noopener">
+      🔗 Open in The Grint App
+    </a>
+  </div>
+
+  <div class="sec">QUICK LINKS</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+    <a href="https://www.thegrint.com" target="_blank" rel="noopener"
+       class="grint-btn grint-btn-secondary" style="display:flex">
+      🌐 Home
+    </a>
+    <a href="https://www.thegrint.com/rounds/new" target="_blank" rel="noopener"
+       class="grint-btn grint-btn-secondary" style="display:flex">
+      ➕ Post Round
+    </a>
+    <a href="https://www.thegrint.com/handicap" target="_blank" rel="noopener"
+       class="grint-btn grint-btn-secondary" style="display:flex">
+      📊 My Handicap
+    </a>
+    <a href="https://www.thegrint.com/clubs" target="_blank" rel="noopener"
+       class="grint-btn grint-btn-secondary" style="display:flex">
+      👥 My Clubs
+    </a>
+  </div>
+
+  <div class="sec">HOW TO USE TOGETHER</div>
+  <div class="grint-info-card">
+    <div class="grint-step">
+      <div class="grint-step-num">1</div>
+      <div class="grint-step-text">
+        <strong>Track scores in The Grint</strong>
+        Post each round live in The Grint for official USGA handicap tracking. The Grint handles your GHIN/WHS index automatically.
+      </div>
+    </div>
+    <div class="grint-step">
+      <div class="grint-step-num">2</div>
+      <div class="grint-step-text">
+        <strong>Enter net scores in the Google Sheet</strong>
+        After each round, update the "Streamsong Data V5" sheet with net scores. This app reads from that sheet for points, pot winners, and the Ryder Cup scoreboard.
+      </div>
+    </div>
+    <div class="grint-step">
+      <div class="grint-step-num">3</div>
+      <div class="grint-step-text">
+        <strong>Check leaderboards here</strong>
+        This app auto-refreshes every 2 minutes. Share this page URL with all players — anyone can track the tournament live from their phone.
+      </div>
+    </div>
+    <div class="grint-step">
+      <div class="grint-step-num">4</div>
+      <div class="grint-step-text">
+        <strong>CTP & Ryder Cup results</strong>
+        Enter match results and CTP winners in the sheet. The Ryder Cup tab here updates in real time as scores are posted.
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">STREAMSONG COURSES ON THE GRINT</div>
+  <div class="grint-info-card">
+    <div class="stat-row">
+      <span class="stat-label">TPC Tampa Bay</span>
+      <a href="https://www.thegrint.com/courses/search?q=TPC+Tampa" target="_blank" rel="noopener"
+         style="font-size:12px;color:var(--gold);font-weight:700;text-decoration:none">Search →</a>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Streamsong Black</span>
+      <a href="https://www.thegrint.com/courses/search?q=Streamsong+Black" target="_blank" rel="noopener"
+         style="font-size:12px;color:var(--gold);font-weight:700;text-decoration:none">Search →</a>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Streamsong Blue</span>
+      <a href="https://www.thegrint.com/courses/search?q=Streamsong+Blue" target="_blank" rel="noopener"
+         style="font-size:12px;color:var(--gold);font-weight:700;text-decoration:none">Search →</a>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Streamsong Red</span>
+      <a href="https://www.thegrint.com/courses/search?q=Streamsong+Red" target="_blank" rel="noopener"
+         style="font-size:12px;color:var(--gold);font-weight:700;text-decoration:none">Search →</a>
+    </div>
+    <div class="stat-row" style="border-bottom:none">
+      <span class="stat-label">Streamsong Chain (par-3s)</span>
+      <a href="https://www.thegrint.com/courses/search?q=Streamsong+Chain" target="_blank" rel="noopener"
+         style="font-size:12px;color:var(--gold);font-weight:700;text-decoration:none">Search →</a>
+    </div>
+  </div>
+</div>
+
+<!-- PLAYER MODAL -->
+<div class="modal" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="bnav-item on" onclick="nav('home',this,'b')"      id="b-home">     <span class="bnav-icon">🏠</span>Home</button>
+  <button class="bnav-item"    onclick="nav('standings',this,'b')" id="b-standings"><span class="bnav-icon">🏅</span>Standings</button>
+  <button class="bnav-item"    onclick="nav('ryder',this,'b')"     id="b-ryder">    <span class="bnav-icon">⚔️</span>Ryder</button>
+  <button class="bnav-item"    onclick="nav('rounds',this,'b')"    id="b-rounds">   <span class="bnav-icon">📊</span>Rounds</button>
+  <button class="bnav-item"    onclick="nav('players',this,'b')"   id="b-players">  <span class="bnav-icon">👤</span>Players</button>
+  <button class="bnav-item"    onclick="nav('grint',this,'b')"     id="b-grint">    <span class="bnav-icon">🏌️</span>Grint</button>
+</nav>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════════════════════════════
+const SHEET_ID   = '14SL-V6hI13ay7NqwyDo-0exyMrrAHwmk54wlgireZmk';
+const ALL_PLAYERS = [
+  'Julio (C)','Manuel','Tomas','Carlos','Cesar','Roberto',
+  'Nico (C)','Antonio','Luifer','Rafa','Javi','Happy'
+];
+const COURSES = { R1:'TPC Tampa', R2:'Black GC', R3:'The Chain', R4:'Blue Course', R5:'Red Course' };
+const POOLS   = { R1:'$120', R2:'$120', R3:'$120', R4:'$120', R5:'$180' };
+const DAYS    = ['Thursday PM','Friday PM','Saturday AM','Saturday PM','Sunday AM'];
+const FMTS    = ['High-Low by Cart','Cart vs Cart High-Low','Four-Ball + CTP H18','Cart vs Cart High-Low','Singles Match Play'];
+const RND_COLORS = ['var(--gold)','#F87171','#6BE08A','#60A5FA','var(--text)'];
+
+// ══════════════════════════════════════════════════════════════
+// FETCH & PARSE
+// ══════════════════════════════════════════════════════════════
+async function fetchSheet(name) {
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(name)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('fetch failed: ' + name);
+  return parseCSV(await res.text());
+}
+
+function parseCSV(text) {
+  return text.split('\n').map(line => {
+    const cells = []; let cur = '', inQ = false;
+    for (const c of line) {
+      if (c === '"') { inQ = !inQ; continue; }
+      if (c === ',' && !inQ) { cells.push(cur.trim()); cur = ''; }
+      else cur += c;
+    }
+    cells.push(cur.trim());
+    return cells;
+  });
+}
+
+function clean(v)  { return (v || '').replace(/^"|"$/g, '').trim(); }
+function num(v)    { const n = parseFloat(clean(v)); return isNaN(n) ? 0 : n; }
+function cleanName(n) { return (n || '').replace(' (C)', '').trim(); }
+
+function isPlayer(name) {
+  return ALL_PLAYERS.some(p => p.toLowerCase() === (name || '').toLowerCase());
+}
+function findPlayerRows(data) {
+  return data.reduce((acc, row, i) => {
+    if (isPlayer(clean(row[0]))) acc.push(i);
+    return acc;
+  }, []);
+}
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let STATE = {
+  players: [], roundScores: [], roundMatches: [],
+  ryder: { blue:[0,0,0,0,0], red:[0,0,0,0,0], blueTotal:0, redTotal:0, status:'' },
+  rounds: [], daily: [], ctp: [], pots: [],
+  lastUpdate: null
+};
+
+// ══════════════════════════════════════════════════════════════
+// LOAD ALL
+// ══════════════════════════════════════════════════════════════
+async function loadAll() {
+  try {
+    const [indData, ryderData, r1Data, r2Data, r3Data, r4Data, r5Data] = await Promise.all([
+      fetchSheet('INDIVIDUAL POT'),
+      fetchSheet('RYDER CUP'),
+      fetchSheet('R1 - TPC Tampa'),
+      fetchSheet('R2 - Black GC'),
+      fetchSheet('R3 - The Chain'),
+      fetchSheet('R4 - Blue Course'),
+      fetchSheet('R5 - Red Course'),
+    ]);
+
+    const roundTabs = [r1Data, r2Data, r3Data, r4Data, r5Data];
+
+    // ── 1. INDIVIDUAL STANDINGS ──────────────────────────────
+    const players = findPlayerRows(indData).map(i => {
+      const r = indData[i];
+      return {
+        name: clean(r[0]), team: clean(r[1]),
+        r1pts: num(r[2]), r2pts: num(r[3]), r3pts: num(r[4]),
+        r4pts: num(r[5]), r5pts: num(r[6]),
+        ctpBonus: num(r[7]), total: num(r[8]), rank: num(r[9]) || 99
+      };
+    }).filter(p => p.name);
+    players.sort((a, b) => a.rank - b.rank || b.total - a.total);
+    STATE.players = players;
+
+    // ── 2. ROUND SCORES ──────────────────────────────────────
+    // Cols: A=Player, B=Team, C=NetScore, D=Rank, E=DailyPts
+    STATE.roundScores = roundTabs.map(tab => {
+      const rows = [];
+      findPlayerRows(tab).forEach(idx => {
+        const r = tab[idx];
+        const netRaw = clean(r[2]);
+        rows.push({
+          name: clean(r[0]), team: clean(r[1]),
+          net: netRaw !== '' ? num(r[2]) : null,
+          rank: num(r[3]), pts: num(r[4])
+        });
+      });
+      rows.sort((a, b) => {
+        if (a.net === null && b.net === null) return 0;
+        if (a.net === null) return 1;
+        if (b.net === null) return -1;
+        return a.net - b.net;
+      });
+      return rows;
+    });
+
+    // ── 3. CTP WINNERS ───────────────────────────────────────
+    STATE.ctp = roundTabs.slice(0, 4).map((tab, ri) => {
+      let winner = '—';
+      for (let i = 0; i < tab.length; i++) {
+        const a = clean(tab[i][0]).toLowerCase();
+        const b = clean(tab[i][1]);
+        if ((a.includes('agreed') || a.includes('hole 18') || a.includes('hole')) && isPlayer(b)) {
+          winner = b; break;
+        }
+        if (clean(tab[i][2]).includes('+2') && isPlayer(b)) {
+          winner = b; break;
+        }
+        if (a.includes('closest') || a.includes('ctp')) {
+          for (let j = i + 1; j < Math.min(i + 4, tab.length); j++) {
+            if (isPlayer(clean(tab[j][1]))) { winner = clean(tab[j][1]); break; }
+          }
+          if (winner !== '—') break;
+        }
+      }
+      return { rnd: `R${ri + 1}`, winner };
+    });
+    STATE.ctp.push({ rnd: 'R5', winner: '—' });
+
+    // ── 4. DAILY POT WINNERS ─────────────────────────────────
+    STATE.daily = roundTabs.map((tab, ri) => {
+      const rnd    = `R${ri + 1}`;
+      const scores = STATE.roundScores[ri].filter(p => p.net !== null);
+      if (!scores.length) return { rnd, course:COURSES[rnd], pool:POOLS[rnd], winner:'—', net:'—', tied:'', potPerWinner:'—', second:'—', secondNet:'—' };
+
+      const bestNet  = scores[0].net;
+      const winners  = scores.filter(p => p.net === bestNet).map(p => cleanName(p.name));
+      const tied     = winners.length > 1;
+      const potVal   = ri === 4 ? 180 : 120;
+      const potPer   = tied ? `$${(potVal / winners.length).toFixed(0)}` : `$${potVal}`;
+      const secondArr = scores.filter(p => p.net > bestNet);
+      const secondNet = secondArr.length ? secondArr[0].net : null;
+      const secondNames = secondNet ? scores.filter(p => p.net === secondNet).map(p => cleanName(p.name)) : [];
+
+      return {
+        rnd, course: COURSES[rnd], pool: POOLS[rnd],
+        winner: winners.join(' & '), net: String(bestNet),
+        tied: tied ? `${winners.length} tied` : 'No tie', potPerWinner: potPer,
+        second: secondNames.join(' & ') || '—',
+        secondNet: secondNet ? String(secondNet) : '—'
+      };
+    });
+
+    // ── 5. RYDER CUP TOTALS ──────────────────────────────────
+    let blueRow = [], redRow = [], ryderStatus = '';
+    ryderData.forEach(r => {
+      const v = clean(r[0]).toLowerCase();
+      if (!isNaN(parseFloat(clean(r[6])))) {
+        if (v.includes('slice') || v.includes('chester')) blueRow = r;
+        if (v.includes('carmencitas'))                    redRow  = r;
+      }
+      if (v.includes('wins') || v.includes('all square') || v.includes('leading') || v.includes('trailing'))
+        ryderStatus = clean(r[0]);
+    });
+    STATE.ryder = {
+      blue: [num(blueRow[1]),num(blueRow[2]),num(blueRow[3]),num(blueRow[4]),num(blueRow[5])],
+      red:  [num(redRow[1]), num(redRow[2]), num(redRow[3]), num(redRow[4]), num(redRow[5])],
+      blueTotal: num(blueRow[6]), redTotal: num(redRow[6]), status: ryderStatus
+    };
+
+    // ── 6. RYDER MATCHES — from each round tab ───────────────
+    // Look for match rows: rows where col A starts with "Match" or "Group"
+    // and col B/C/D/E have player names or scores
+    // Format assumed: ColA=Label, ColB=BluePair, ColC=vs, ColD=RedPair, ColE=Result, ColF=BluePts, ColG=RedPts
+    STATE.roundMatches = roundTabs.map((tab, ri) => {
+      const isSingles = ri === 4;
+      const matches = [];
+      for (let i = 0; i < tab.length; i++) {
+        const a = clean(tab[i][0]).toLowerCase();
+        const isMatchRow = a.startsWith('match') || a.startsWith('group') ||
+                           a.startsWith('cart') || a.startsWith('singles') ||
+                           a.startsWith('pair') || /^[a-z]1$/i.test(a.trim());
+        if (!isMatchRow) continue;
+
+        // Try to find blue/red players and result
+        const label  = clean(tab[i][0]);
+        const result = clean(tab[i][4]) || clean(tab[i][5]) || '';
+        if (!result) continue;
+
+        const bp1 = clean(tab[i][1]);
+        const bp2 = isSingles ? '' : clean(tab[i][2]);
+        const rp1 = clean(tab[i][3]);
+        const rp2 = isSingles ? '' : clean(tab[i][4]);
+        const bPts = result === 'Blue Win' ? 1 : result === 'Halved' ? 0.5 : 0;
+        const rPts = result === 'Red Win'  ? 1 : result === 'Halved' ? 0.5 : 0;
+
+        matches.push({ label, bp1, bp2, rp1, rp2, result, bluePts: bPts, redPts: rPts });
+      }
+      return matches;
+    });
+
+    // ── 7. ROUNDS SUMMARY ────────────────────────────────────
+    STATE.rounds = STATE.daily.map((d, i) => ({
+      id: d.rnd, course: d.course,
+      done: d.winner && d.winner !== '—',
+      blue: STATE.ryder.blue[i], red: STATE.ryder.red[i]
+    }));
+
+    // ── 8. POTS ──────────────────────────────────────────────
+    STATE.pots = [
+      { icon:'🏆', name:'Individual Tournament', desc:'1st $750 · 2nd $350 · 3rd $100', amt:'$1,200', status:'After R5' },
+      { icon:'⚔️', name:'Ryder Cup Prize',        desc:'Winners: $50 + Sunday lunch',    amt:'$50+🍽️', status:'After R5' },
+      { icon:'🗓️', name:'Daily Pots (R1–R5)',      desc:'Best net score each round wins', amt:'$660',   status:'By round' },
+      { icon:'🎲', name:"Winner's Pot",            desc:"Pick the champion — split if tied", amt:'$120', status:'After R5' },
+      { icon:'🥄', name:"Loser's Pot",             desc:'Pick last — split if tied',       amt:'$120',  status:'After R5' },
+      { icon:'🎱', name:'HIO Insurance',           desc:'$10/player · Dinner if no HIO',   amt:'$120',  status:'Active' },
+    ];
+
+    STATE.lastUpdate = new Date();
+    render();
+
+  } catch (e) {
+    console.error('Load error:', e);
+    document.getElementById('standings-note').textContent =
+      '⚠️ Cannot load sheet. Go to File → Share → Publish to web in Google Sheets.';
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════
+function teamColor(team) { return team === 'Blue' ? '#60A5FA' : '#F87171'; }
+function teamDot(team) {
+  return `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;
+    background:${teamColor(team)};margin-right:4px;vertical-align:middle"></span>`;
+}
+function capTag(name) {
+  return name.includes('(C)') ?
+    `<span style="font-size:8px;background:rgba(200,150,12,.15);color:var(--gold);
+      border:1px solid rgba(200,150,12,.3);border-radius:3px;padding:1px 4px;
+      margin-left:4px;vertical-align:middle">C</span>` : '';
+}
+
+function lbRow(p, rank, maxPts) {
+  const isTop  = rank <= 3;
+  const leader = STATE.players[0];
+  const gap = rank === 1
+    ? `<span style="font-size:8px;font-weight:700;color:var(--gold);letter-spacing:.5px">LEADER</span>`
+    : `<span style="font-size:10px;color:var(--t3)">-${(leader.total - p.total).toFixed(1)}</span>`;
+  const barW  = maxPts ? Math.round(p.total / maxPts * 100) : 0;
+  const rndPts = (p.r1pts + p.r2pts + p.r3pts + p.r4pts + p.r5pts).toFixed(1);
+  return `
+    <div class="lb-row ${isTop ? 'top' : ''}" onclick="openPlayer('${p.name}')">
+      <div class="rank-num">${rank}</div>
+      <div>
+        <div class="pname">${cleanName(p.name)}${capTag(p.name)}</div>
+        <div class="pmeta">${teamDot(p.team)}${p.team === 'Blue' ? 'Slice Chester' : 'Carmencitas'}</div>
+        <div class="pbar"><div class="pbar-fill" style="width:${barW}%"></div></div>
+      </div>
+      <div class="pts-r">${rndPts}</div>
+      <div class="pts-total" style="color:${teamColor(p.team)}">${p.total.toFixed(1)}</div>
+      ${gap}
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════════════════════════
+function renderHome() {
+  const { ryder, players, rounds, daily, ctp } = STATE;
+  const leading = ryder.blueTotal > ryder.redTotal
+    ? `🔵 Blue leads by ${(ryder.blueTotal - ryder.redTotal).toFixed(1)} pts`
+    : ryder.redTotal > ryder.blueTotal
+    ? `🔴 Red leads by ${(ryder.redTotal - ryder.blueTotal).toFixed(1)} pts`
+    : '⚔️ All Square';
+
+  document.getElementById('home-ryder').innerHTML = `
+    <div class="ryder-hero">
+      <div class="ryder-eyebrow">⚔️ RYDER CUP — LIVE SCORE</div>
+      <div class="score-row">
+        <div class="score-block">
+          <div class="team-tag" style="color:#60A5FA">🔵 Slice Chester</div>
+          <div class="score-num" style="color:#60A5FA">${ryder.blueTotal.toFixed(1)}</div>
+          <div class="score-sub">Ryder pts</div>
+        </div>
+        <div class="vs-txt">VS</div>
+        <div class="score-block">
+          <div class="team-tag" style="color:#F87171">Carmencitas 🔴</div>
+          <div class="score-num" style="color:#F87171">${ryder.redTotal.toFixed(1)}</div>
+          <div class="score-sub">Ryder pts</div>
+        </div>
+      </div>
+      <div class="ryder-banner">${leading}</div>
+    </div>`;
+
+  document.getElementById('home-rounds').innerHTML = rounds.map((r, i) => {
+    const live = !r.done && i === rounds.filter(x => x.done).length;
+    const badgeCls = r.done ? 'badge-done' : live ? 'badge-live' : 'badge-pend';
+    const badgeTxt = r.done ? '✓ Done' : live ? '● Live' : ['Thu','Fri','Sat AM','Sat PM','Sun'][i];
+    const col = RND_COLORS[i];
+    return `
+      <div class="r-pill ${r.done ? 'done' : live ? 'live' : ''}"
+           onclick="nav('rounds',document.querySelector('.nav-btn:nth-child(4)'));setTimeout(()=>toggleRound(${i}),150)">
+        <div class="r-label" style="color:${col}">${r.id}</div>
+        <div class="r-course">${r.course}</div>
+        <span class="r-badge ${badgeCls}">${badgeTxt}</span>
+      </div>`;
+  }).join('');
+
+  const maxPts = players[0]?.total || 1;
+  document.getElementById('home-lb').innerHTML = players.slice(0, 3).map((p, i) => lbRow(p, i + 1, maxPts)).join('');
+
+  const lastDaily = [...daily].reverse().find(d => d.winner !== '—');
+  const lastCTP   = [...ctp].reverse().find(c => c.winner !== '—');
+  document.getElementById('home-spotlight').innerHTML = `
+    <div class="stat-row">
+      <span class="stat-label">Individual Leader</span>
+      <span class="stat-val sv-gold">
+        ${players[0]?.name ? cleanName(players[0].name) + ' · ' + players[0].total.toFixed(1) + ' pts' : 'TBD'}
+      </span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Last Daily Winner</span>
+      <span class="stat-val sv-gold">
+        ${lastDaily ? lastDaily.winner + ' (' + lastDaily.rnd + ' · Net ' + lastDaily.net + ')' : 'Pending'}
+      </span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Last CTP Winner</span>
+      <span class="stat-val" style="color:#C084FC">
+        ${lastCTP ? cleanName(lastCTP.winner) + ' (' + lastCTP.rnd + ')' : 'Pending'}
+      </span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">🎱 HIO Status</span>
+      <span class="stat-val sv-green">No HIO yet — 3.56% odds</span>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// STANDINGS
+// ══════════════════════════════════════════════════════════════
+function renderStandings() {
+  const maxPts = STATE.players[0]?.total || 1;
+  document.getElementById('standings-note').textContent =
+    STATE.lastUpdate ? `Last updated ${STATE.lastUpdate.toLocaleTimeString()}` : '';
+  document.getElementById('full-lb').innerHTML =
+    STATE.players.map((p, i) => lbRow(p, i + 1, maxPts)).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// RYDER CUP
+// ══════════════════════════════════════════════════════════════
+function renderRyder() {
+  const { ryder } = STATE;
+  const bannerText = ryder.status || (
+    ryder.blueTotal > ryder.redTotal
+      ? `🏆 Slice Chester Leading (${(ryder.blueTotal - ryder.redTotal).toFixed(1)} pts)`
+      : ryder.redTotal > ryder.blueTotal
+      ? `🏆 Carmencitas Leading (${(ryder.redTotal - ryder.blueTotal).toFixed(1)} pts)`
+      : '⚔️ All Square');
+
+  document.getElementById('ryder-teams').innerHTML = `
+    <div class="team-card tc-blue">
+      <div class="tc-name" style="color:#60A5FA">🔵 Slice Chester City</div>
+      <div class="tc-score">${ryder.blueTotal.toFixed(1)}</div>
+      <div class="tc-label">of 30 pts</div>
+    </div>
+    <div class="team-card tc-red">
+      <div class="tc-name" style="color:#F87171">Carmencitas 🔴</div>
+      <div class="tc-score">${ryder.redTotal.toFixed(1)}</div>
+      <div class="tc-label">of 30 pts</div>
+    </div>`;
+
+  document.getElementById('ryder-banner').innerHTML =
+    `<div class="ryder-banner">${bannerText}</div>`;
+
+  const rnds   = ['TPC Tampa','Black GC','The Chain','Blue Course','Red Course'];
+  const fmts   = ['High-Low Cart','Cart vs Cart','Four-Ball + CTP','Cart vs Cart','Singles'];
+  const maxPts = [3, 6, 6, 9, 6];
+
+  document.getElementById('ryder-rounds').innerHTML = ryder.blue.map((b, i) => {
+    const r       = ryder.red[i];
+    const done    = b + r > 0;
+    const matches = (STATE.roundMatches || [])[i] || [];
+
+    const matchRows = matches.length
+      ? matches.map(m => {
+          const blueWon  = m.result === 'Blue Win';
+          const redWon   = m.result === 'Red Win';
+          const icon     = blueWon ? '🔵' : redWon ? '🔴' : '🤝';
+          const resColor = blueWon ? '#60A5FA' : redWon ? '#F87171' : '#F59E0B';
+          const bg       = blueWon ? 'rgba(30,58,138,.1)' : redWon ? 'rgba(127,29,29,.1)' : 'rgba(245,158,11,.05)';
+          const bluePair = i === 4
+            ? `<span style="color:#60A5FA;font-weight:700">${cleanName(m.bp1)}</span>`
+            : `<span style="color:#60A5FA;font-weight:700">${[cleanName(m.bp1),cleanName(m.bp2)].filter(Boolean).join(' & ')}</span>`;
+          const redPair = i === 4
+            ? `<span style="color:#F87171;font-weight:700">${cleanName(m.rp1)}</span>`
+            : `<span style="color:#F87171;font-weight:700">${[cleanName(m.rp1),cleanName(m.rp2)].filter(Boolean).join(' & ')}</span>`;
+          return `
+            <div style="padding:11px 14px;border-bottom:1px solid var(--border);background:${bg}">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                <div style="flex:1">
+                  <div style="font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.5px;margin-bottom:5px">${m.label.toUpperCase()}</div>
+                  <div style="display:flex;align-items:center;gap:6px;font-size:13px;flex-wrap:wrap">
+                    ${bluePair}
+                    <span style="color:var(--t3);font-size:11px">vs</span>
+                    ${redPair}
+                  </div>
+                  <div style="display:flex;gap:12px;margin-top:4px">
+                    <span style="font-size:10px;color:#60A5FA">🔵 +${m.bluePts.toFixed(1)} pts</span>
+                    <span style="font-size:10px;color:#F87171">🔴 +${m.redPts.toFixed(1)} pts</span>
+                  </div>
+                </div>
+                <div style="flex-shrink:0;text-align:right;padding-top:14px">
+                  <span style="font-size:14px;font-weight:700;color:${resColor}">${icon} ${m.result}</span>
+                </div>
+              </div>
+            </div>`;
+        }).join('')
+      : done
+        ? `<div style="padding:12px 14px;color:var(--t3);font-size:11px;text-align:center">Scores in sheet — enter match results to see here</div>`
+        : `<div style="padding:12px 14px;color:var(--t3);font-size:11px;text-align:center">Upcoming</div>`;
+
+    return `
+      <div style="border-bottom:1px solid var(--border)">
+        <div onclick="toggleRyderRound(${i})" style="display:flex;align-items:center;padding:12px 14px;cursor:pointer;gap:10px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t2);width:28px">R${i+1}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">${rnds[i]}</div>
+            <div style="font-size:10px;color:var(--t3)">${fmts[i]} · max ${maxPts[i]} pts</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#60A5FA">${done ? b.toFixed(1) : '—'}</span>
+            <span style="font-size:12px;color:var(--t3)">·</span>
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#F87171">${done ? r.toFixed(1) : '—'}</span>
+            <span id="ryder-chv-${i}" style="font-size:16px;color:var(--t3);transition:transform .2s;margin-left:4px">▼</span>
+          </div>
+        </div>
+        <div id="ryder-matches-${i}" style="display:none;border-top:1px solid var(--border)">
+          ${matchRows}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleRyderRound(i) {
+  const el  = document.getElementById(`ryder-matches-${i}`);
+  const chv = document.getElementById(`ryder-chv-${i}`);
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  chv.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+// ══════════════════════════════════════════════════════════════
+// ROUNDS — full scorecard
+// ══════════════════════════════════════════════════════════════
+function renderRounds() {
+  const { rounds, daily, ctp } = STATE;
+
+  document.getElementById('rounds-content').innerHTML = rounds.map((r, i) => {
+    const d      = daily[i] || {};
+    const c      = ctp[i]   || {};
+    const scores = (STATE.roundScores || [])[i] || [];
+    const hasDailyWinner = d.winner && d.winner !== '—';
+    const hasCTP = c.winner && c.winner !== '—';
+
+    const scoreRows = scores.filter(p => p.net !== null).map((p, pi) => {
+      const medal = pi === 0 ? '🥇' : pi === 1 ? '🥈' : pi === 2 ? '🥉' : pi + 1;
+      const rowBg = pi === 0 ? 'rgba(200,150,12,.07)' : pi % 2 === 0 ? 'rgba(255,255,255,.02)' : 'transparent';
+      const isCtpWinner = hasCTP && cleanName(c.winner) === cleanName(p.name);
+      return `
+        <div style="display:grid;grid-template-columns:28px 1fr 50px 42px 56px;
+                    padding:9px 12px;border-bottom:1px solid var(--border);
+                    align-items:center;background:${rowBg}">
+          <div style="font-size:${pi < 3 ? 15 : 12}px;text-align:center">${medal}</div>
+          <div>
+            <span style="font-size:13px;font-weight:600">${cleanName(p.name)}</span>
+            <span style="display:inline-block;width:6px;height:6px;border-radius:50%;
+              background:${teamColor(p.team)};margin-left:5px;vertical-align:middle"></span>
+            ${isCtpWinner ? `<span style="font-size:9px;background:rgba(192,132,252,.15);color:#C084FC;
+              border:1px solid rgba(192,132,252,.3);border-radius:3px;padding:1px 4px;margin-left:3px">⭐ CTP</span>` : ''}
+          </div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-align:right">${p.net}</div>
+          <div style="font-size:10px;color:var(--t3);text-align:center">${p.rank ? '#' + p.rank : '—'}</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);text-align:right">
+            ${p.pts > 0 ? p.pts.toFixed(1) : '—'}
+          </div>
+        </div>`;
+    }).join('') || `<div style="padding:20px;text-align:center;color:var(--t3);font-size:12px">No scores entered yet</div>`;
+
+    const prizeRow = hasDailyWinner ? `
+      <div style="padding:10px 12px;background:rgba(200,150,12,.08);border-top:1px solid rgba(200,150,12,.2)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:10px;color:var(--t3);margin-bottom:1px">💰 DAILY POT WINNER</div>
+            <div style="font-size:14px;font-weight:700;color:var(--gold)">${d.winner}</div>
+            <div style="font-size:10px;color:var(--t3)">Net ${d.net}${d.second && d.second !== '—' ? ' · 2nd: ' + d.second + ' (Net ' + d.secondNet + ')' : ''}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold)">${d.potPerWinner}</div>
+            <div style="font-size:9px;color:var(--t3)">${d.tied && d.tied !== 'No tie' ? d.tied : 'Winner takes pot'}</div>
+          </div>
+        </div>
+      </div>` : '';
+
+    return `
+      <div class="rs-card" style="margin-bottom:14px">
+        <div class="rs-hdr" onclick="toggleRound(${i})" style="cursor:pointer">
+          <div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:${RND_COLORS[i]}">${r.id} · ${r.course}</div>
+            <div style="font-size:11px;color:var(--t2)">${FMTS[i]} · ${DAYS[i]}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span class="r-badge ${r.done ? 'badge-done' : 'badge-pend'}">${r.done ? '✓ Done' : 'Upcoming'}</span>
+            <span id="chevron-${i}" style="font-size:18px;color:var(--t3);transition:transform .2s">▼</span>
+          </div>
+        </div>
+        <!-- Summary bar -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--border)">
+          <div style="padding:8px 10px;border-right:1px solid var(--border)">
+            <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Daily Pot</div>
+            <div style="font-size:12px;font-weight:700;color:${hasDailyWinner ? 'var(--gold)' : 'var(--t3)'}">
+              ${hasDailyWinner ? d.winner : 'Pending'}</div>
+            ${hasDailyWinner ? `<div style="font-size:10px;color:var(--t3)">Net ${d.net} · ${POOLS['R'+(i+1)]}</div>` : ''}
+          </div>
+          <div style="padding:8px 10px;border-right:1px solid var(--border)">
+            <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">CTP</div>
+            <div style="font-size:12px;font-weight:700;color:#C084FC">
+              ${i < 4 ? (hasCTP ? cleanName(c.winner) : 'Pending') : 'N/A'}</div>
+            ${hasCTP && i < 4 ? `<div style="font-size:10px;color:var(--t3)">+2 ind pts</div>` : ''}
+          </div>
+          <div style="padding:8px 10px">
+            <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Ryder</div>
+            <div style="font-size:12px;font-weight:700">
+              <span style="color:#60A5FA">${r.blue.toFixed(1)}</span>
+              <span style="font-size:10px;color:var(--t3)"> vs </span>
+              <span style="color:#F87171">${r.red.toFixed(1)}</span>
+            </div>
+          </div>
+        </div>
+        <!-- Expandable scorecard -->
+        <div id="round-scores-${i}" style="display:none">
+          <div style="display:grid;grid-template-columns:28px 1fr 50px 42px 56px;
+                      padding:7px 12px;background:var(--bg3);border-bottom:1px solid var(--border);
+                      font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase">
+            <div></div><div>Player</div>
+            <div style="text-align:right">Net</div>
+            <div style="text-align:center">Rank</div>
+            <div style="text-align:right">Pts</div>
+          </div>
+          ${scoreRows}
+          ${prizeRow}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleRound(i) {
+  const el  = document.getElementById(`round-scores-${i}`);
+  const chv = document.getElementById(`chevron-${i}`);
+  const open = el.style.display === 'none';
+  el.style.display = open ? 'block' : 'none';
+  chv.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+// ══════════════════════════════════════════════════════════════
+// PLAYERS
+// ══════════════════════════════════════════════════════════════
+function renderPlayers() {
+  function card(p) {
+    const col       = teamColor(p.team);
+    const borderCol = p.team === 'Blue' ? 'rgba(30,58,138,.4)' : 'rgba(127,29,29,.4)';
+    const bgCol     = p.team === 'Blue' ? 'rgba(30,58,138,.15)' : 'rgba(127,29,29,.15)';
+    const nets = (STATE.roundScores || []).map(rndScores => {
+      const found = rndScores.find(s => cleanName(s.name) === cleanName(p.name));
+      return found && found.net !== null ? found.net : null;
+    });
+    const netRow = ['R1','R2','R3','R4','R5'].map((r, i) =>
+      `<span style="margin-right:8px">
+         <span style="color:var(--t3);font-size:9px">${r} </span>
+         <span style="font-size:11px;font-weight:600;color:var(--text)">${nets[i] !== null ? nets[i] : '—'}</span>
+       </span>`
+    ).join('');
+    const roundsPlayed = nets.filter(n => n !== null).length;
+    return `
+      <div onclick="openPlayer('${p.name}')" style="background:${bgCol};border:1px solid ${borderCol};
+           border-top:3px solid ${col};border-radius:12px;padding:13px;cursor:pointer">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+          <div style="font-size:15px;font-weight:700;color:${col}">${cleanName(p.name)}${capTag(p.name)}</div>
+          <div style="text-align:right">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--gold);line-height:1">${p.total.toFixed(1)}</div>
+            <div style="font-size:9px;color:var(--t3)">IND PTS · #${p.rank}</div>
+          </div>
+        </div>
+        <div style="font-size:10px;margin-bottom:6px;line-height:1.8">${netRow}</div>
+        <div style="font-size:9px;color:var(--t3)">${roundsPlayed}/5 rounds played</div>
+      </div>`;
+  }
+
+  const blue = STATE.players.filter(p => p.team === 'Blue');
+  const red  = STATE.players.filter(p => p.team === 'Red');
+  document.getElementById('blue-grid').innerHTML = blue.map(card).join('');
+  document.getElementById('red-grid').innerHTML  = red.map(card).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// POTS
+// ══════════════════════════════════════════════════════════════
+function renderPots() {
+  document.getElementById('pots-list').innerHTML = STATE.pots.map(p => `
+    <div class="pot-card">
+      <div class="pot-icon">${p.icon}</div>
+      <div class="pot-info"><div class="pot-name">${p.name}</div><div class="pot-desc">${p.desc}</div></div>
+      <div class="pot-right"><div class="pot-amt">${p.amt}</div><div class="pot-status">${p.status}</div></div>
+    </div>`).join('');
+
+  const { daily, ctp } = STATE;
+  document.getElementById('daily-winners').innerHTML = daily.map(d => `
+    <div class="stat-row">
+      <span class="stat-label">${d.rnd} · ${d.course} · ${d.pool}</span>
+      <span class="stat-val ${d.winner !== '—' ? 'sv-gold' : ''}">
+        ${d.winner !== '—'
+          ? d.winner + ' · Net ' + d.net + (d.tied && d.tied !== 'No tie' ? ' (' + d.tied + ' · ' + d.potPerWinner + ' each)' : '')
+          : 'Pending'}
+      </span>
+    </div>`).join('');
+
+  document.getElementById('ctp-winners').innerHTML = ctp.map(c => `
+    <div class="stat-row">
+      <span class="stat-label">${c.rnd} CTP (+2 individual pts)</span>
+      <span class="stat-val" style="color:${c.winner !== '—' ? '#C084FC' : 'var(--t3)'}">
+        ${c.winner !== '—' ? cleanName(c.winner) : c.rnd === 'R5' ? 'N/A' : 'Pending'}
+      </span>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+// PLAYER MODAL
+// ══════════════════════════════════════════════════════════════
+function openPlayer(name) {
+  const p = STATE.players.find(x => x.name === name);
+  if (!p) return;
+  const col    = teamColor(p.team);
+  const rndPts = [p.r1pts, p.r2pts, p.r3pts, p.r4pts, p.r5pts];
+  const nets   = (STATE.roundScores || []).map(rndScores => {
+    const found = rndScores.find(s => cleanName(s.name) === cleanName(name));
+    return (found && found.net !== null) ? found : null;
+  });
+  const ctpRnds = (STATE.ctp || []).filter(c => c.winner !== '—' && cleanName(c.winner) === cleanName(name)).map(c => c.rnd);
+  const courses = ['TPC Tampa','Black GC','The Chain','Blue Course','Red Course'];
+
+  const roundRows = [0,1,2,3,4].map(i => {
+    const ns     = nets[i];
+    const pts    = rndPts[i];
+    const hasCTP = ctpRnds.includes(`R${i+1}`);
+    return `
+      <div style="display:grid;grid-template-columns:50px 1fr 46px 38px 62px;
+                  padding:10px 14px;border-bottom:1px solid var(--border);align-items:center;gap:4px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--t2)">R${i+1}</div>
+        <div>
+          <div style="font-size:12px;font-weight:500">${courses[i]}</div>
+          ${hasCTP ? `<div style="font-size:9px;color:#C084FC">⭐ CTP +2 pts</div>` : ''}
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;text-align:right">
+          ${ns ? ns.net : '—'}
+        </div>
+        <div style="font-size:10px;color:var(--t3);text-align:center">
+          ${ns && ns.rank > 0 ? '#' + ns.rank : ''}
+        </div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);text-align:right">
+          ${pts > 0 ? pts.toFixed(1) + (hasCTP ? ' (+2)' : '') : '—'}
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-name" style="color:${col}">${cleanName(p.name)}${capTag(p.name)}</div>
+    <div class="modal-meta">${p.team === 'Blue' ? '🔵 Slice Chester City' : '🔴 Carmencitas'} · Rank #${p.rank}</div>
+    <div class="modal-grid">
+      <div class="mstat"><div class="mstat-val">${p.total.toFixed(1)}</div><div class="mstat-lbl">Total Pts</div></div>
+      <div class="mstat"><div class="mstat-val">#${p.rank}</div><div class="mstat-lbl">Overall</div></div>
+      <div class="mstat"><div class="mstat-val">${p.ctpBonus > 0 ? '+' + p.ctpBonus : '0'}</div><div class="mstat-lbl">CTP Bonus</div></div>
+    </div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--t3);
+                text-transform:uppercase;margin-bottom:8px">ROUND BY ROUND</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:50px 1fr 46px 38px 62px;
+                  padding:7px 14px;background:var(--bg4);border-bottom:1px solid var(--border);
+                  font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase">
+        <div>Round</div><div>Course</div>
+        <div style="text-align:right">Net</div>
+        <div style="text-align:center">Rank</div>
+        <div style="text-align:right">Pts</div>
+      </div>
+      ${roundRows}
+      <div style="padding:10px 14px;display:flex;justify-content:space-between;
+                  background:rgba(200,150,12,.06);border-top:1px solid rgba(200,150,12,.2)">
+        <span style="font-size:12px;font-weight:700">TOTAL</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)">${p.total.toFixed(1)} pts</span>
+      </div>
+    </div>`;
+
+  document.getElementById('modal').classList.add('on');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('on'); }
+
+// ══════════════════════════════════════════════════════════════
+// THE GRINT — persist group URL in localStorage
+// ══════════════════════════════════════════════════════════════
+function saveGrintUrl(val) {
+  localStorage.setItem('grint_url', val);
+  updateGrintBtn(val);
+}
+
+function updateGrintBtn(url) {
+  const btn = document.getElementById('grint-open-btn');
+  if (!btn) return;
+  const valid = url && url.startsWith('http');
+  btn.href = valid ? url : 'https://www.thegrint.com';
+  btn.style.opacity = valid ? '1' : '0.5';
+}
+
+function initGrint() {
+  const saved = localStorage.getItem('grint_url') || '';
+  const input = document.getElementById('grint-url');
+  if (input && saved) { input.value = saved; updateGrintBtn(saved); }
+}
+
+// ══════════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════════
+function nav(id, btn, type) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+
+  if (type === 'b') {
+    document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    // Also sync top nav
+    const topBtns = document.querySelectorAll('.nav-btn');
+    const pageOrder = ['home','standings','ryder','rounds','players','pots','grint'];
+    topBtns.forEach(b => b.classList.remove('on'));
+    const idx = pageOrder.indexOf(id);
+    if (idx >= 0 && topBtns[idx]) topBtns[idx].classList.add('on');
+  } else {
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('on'));
+    btn.classList.add('on');
+    const bi = document.getElementById('b-' + id);
+    if (bi) {
+      document.querySelectorAll('.bnav-item').forEach(b => b.classList.remove('on'));
+      bi.classList.add('on');
+    }
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER ALL
+// ══════════════════════════════════════════════════════════════
+function render() {
+  renderHome();
+  renderStandings();
+  renderRyder();
+  renderRounds();
+  renderPlayers();
+  renderPots();
+}
+
+// ── INIT ──────────────────────────────────────────────────────
+initGrint();
+loadAll();
+setInterval(loadAll, 120000); // refresh every 2 minutes
+</script>
+</body>
+</html>
