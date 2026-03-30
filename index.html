@@ -475,12 +475,12 @@ body::before{
 
 /* ── SCORECARD GRID (responsive) ─────────────────────────── */
 .scorecard-hdr{
-  display:grid;grid-template-columns:28px 1fr 50px 42px 56px;
+  display:grid;grid-template-columns:28px 1fr 44px 44px 36px 52px;
   padding:7px 12px;background:var(--bg3);border-bottom:1px solid var(--border);
   font-size:11px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase;
 }
 .scorecard-row{
-  display:grid;grid-template-columns:28px 1fr 50px 42px 56px;
+  display:grid;grid-template-columns:28px 1fr 44px 44px 36px 52px;
   padding:9px 12px;border-bottom:1px solid var(--border);align-items:center;
 }
 .modal-round-hdr{
@@ -934,7 +934,7 @@ function findPlayerRows(data) {
 let STATE = {
   players: [], roundScores: [], roundMatches: [],
   ryder: { blue:[0,0,0,0,0], red:[0,0,0,0,0], blueTotal:0, redTotal:0, status:'' },
-  rounds: [], daily: [], ctp: [], pots: [],
+  rounds: [], daily: [], ctp: [], ctpGroups: [], pots: [],
   lastUpdate: null
 };
 
@@ -943,7 +943,7 @@ let STATE = {
 // ══════════════════════════════════════════════════════════════
 async function loadAll() {
   try {
-    const [indData, ryderData, r1Data, r2Data, r3Data, r4Data, r5Data, ryderMatchesData] = await Promise.all([
+    const [indData, ryderData, r1Data, r2Data, r3Data, r4Data, r5Data, ryderMatchesData, ctpData] = await Promise.all([
       fetchSheet('INDIVIDUAL POT'),
       fetchSheet('RYDER CUP'),
       fetchSheet('R1 - TPC Tampa'),
@@ -952,6 +952,7 @@ async function loadAll() {
       fetchSheet('R4 - Blue Course'),
       fetchSheet('R5 - Red Course'),
       fetchSheet('Ryder Cup Matches'),
+      fetchSheet('CTP'),
     ]);
 
     const roundTabs = [r1Data, r2Data, r3Data, r4Data, r5Data];
@@ -970,7 +971,7 @@ async function loadAll() {
     STATE.players = players;
 
     // ── 2. ROUND SCORES ──────────────────────────────────────
-    // Cols: A=Player, B=Team, C=NetScore, D=Rank, E=DailyPts
+    // Cols: A=Player, B=Team, C=HC, D=GrossScore, E=Net, F=Rank, G=DailyPts
     STATE.roundScores = roundTabs.map(tab => {
       const rows = [];
       findPlayerRows(tab).forEach(idx => {
@@ -981,6 +982,7 @@ async function loadAll() {
           score: clean(r[3]) !== '' ? num(r[3]) : null,
           net:   clean(r[4]) !== '' ? num(r[4]) : null,
           rank:  num(r[5]),
+          pts:   clean(r[6]) !== '' ? num(r[6]) : null,
         });
       });
       rows.sort((a, b) => {
@@ -992,28 +994,22 @@ async function loadAll() {
       return rows;
     });
 
-    // ── 3. CTP WINNERS ───────────────────────────────────────
-    STATE.ctp = roundTabs.slice(0, 4).map((tab, ri) => {
-      let winner = '—';
-      for (let i = 0; i < tab.length; i++) {
-        const a = clean(tab[i][0]).toLowerCase();
-        const b = clean(tab[i][1]);
-        if ((a.includes('agreed') || a.includes('hole 18') || a.includes('hole')) && isPlayer(b)) {
-          winner = b; break;
-        }
-        if (clean(tab[i][2]).includes('+2') && isPlayer(b)) {
-          winner = b; break;
-        }
-        if (a.includes('closest') || a.includes('ctp')) {
-          for (let j = i + 1; j < Math.min(i + 4, tab.length); j++) {
-            if (isPlayer(clean(tab[j][1]))) { winner = clean(tab[j][1]); break; }
-          }
-          if (winner !== '—') break;
-        }
-      }
-      return { rnd: `R${ri + 1}`, winner };
+    // ── 3. CTP WINNERS — from "CTP" tab ──────────────────────
+    // Cols: Group | CTP Winner | Their Team | Blue | Red
+    const ctpGroups = [];
+    ctpData.forEach(row => {
+      if (!row || !/^group\s*\d/i.test(clean(row[0]))) return;
+      ctpGroups.push({
+        group:  clean(row[0]),
+        winner: clean(row[1]),
+        team:   clean(row[2]),
+        blue:   num(row[3]),
+        red:    num(row[4]),
+      });
     });
-    STATE.ctp.push({ rnd: 'R5', winner: '—' });
+    STATE.ctpGroups = ctpGroups;
+    // Keep legacy STATE.ctp array for other parts of the app
+    STATE.ctp = ['R1','R2','R3','R4','R5'].map(rnd => ({ rnd, winner: '—' }));
 
     // ── 4. DAILY POT WINNERS ─────────────────────────────────
     STATE.daily = roundTabs.map((tab, ri) => {
@@ -1057,22 +1053,13 @@ async function loadAll() {
       ctpWinner: null, ctpTeam: null
     };
 
-    // ── 5.5. R3 CTP → RYDER BONUS (+1 to winner's team) ─────
-    const r3CTP = STATE.ctp[2];
-    if (r3CTP && r3CTP.winner !== '—') {
-      const ctpPlayer = STATE.players.find(p => cleanName(p.name) === cleanName(r3CTP.winner));
-      if (ctpPlayer) {
-        if (ctpPlayer.team === 'Blue') {
-          STATE.ryder.blue[2] += 1;
-          STATE.ryder.blueTotal += 1;
-        } else {
-          STATE.ryder.red[2] += 1;
-          STATE.ryder.redTotal += 1;
-        }
-        STATE.ryder.ctpWinner = cleanName(r3CTP.winner);
-        STATE.ryder.ctpTeam   = ctpPlayer.team;
-      }
-    }
+    // ── 5.5. R3 CTP → RYDER BONUS (from CTP tab) ────────────
+    const ctpBlueBonus = STATE.ctpGroups.reduce((s, g) => s + g.blue, 0);
+    const ctpRedBonus  = STATE.ctpGroups.reduce((s, g) => s + g.red,  0);
+    STATE.ryder.blue[2] += ctpBlueBonus;
+    STATE.ryder.red[2]  += ctpRedBonus;
+    STATE.ryder.blueTotal += ctpBlueBonus;
+    STATE.ryder.redTotal  += ctpRedBonus;
 
     // ── 6. RYDER MATCHES — from "Ryder Cup Matches" tab ─────────
     // Groups (R1-R4): Group | Blue P1 | Blue P2 | vs | Red P1 | Red P2 | Result | Blue | Red
@@ -1112,8 +1099,10 @@ async function loadAll() {
       STATE.ryder.blue[i] = matches.reduce((s, m) => s + m.bluePts, 0);
       STATE.ryder.red[i]  = matches.reduce((s, m) => s + m.redPts, 0);
     });
-    if (STATE.ryder.ctpTeam === 'Blue') STATE.ryder.blue[2] += 1;
-    else if (STATE.ryder.ctpTeam === 'Red') STATE.ryder.red[2] += 1;
+    (STATE.ctpGroups || []).forEach(g => {
+      STATE.ryder.blue[2] += g.blue;
+      STATE.ryder.red[2]  += g.red;
+    });
     STATE.ryder.blueTotal = STATE.ryder.blue.reduce((s, v) => s + v, 0);
     STATE.ryder.redTotal  = STATE.ryder.red.reduce((s, v) => s + v, 0);
 
@@ -1392,13 +1381,15 @@ function renderRyder() {
             <div style="padding:11px 14px;background:rgba(0,103,71,.06);border-top:1px solid var(--border);display:flex;align-items:center;gap:12px">
               <span style="font-size:20px">⛳</span>
               <div>
-                <div style="font-size:9px;font-weight:700;color:var(--t3);letter-spacing:.6px;margin-bottom:3px">CTP HOLE 18 · RYDER BONUS</div>
-                ${ryder.ctpWinner
-                  ? `<div style="font-size:13px;font-weight:600">${ryder.ctpWinner}
-                       <span style="color:${ryder.ctpTeam === 'Blue' ? '#1D4ED8' : '#DC2626'};margin-left:4px">
-                         → ${ryder.ctpTeam} +1 pt
-                       </span>
-                     </div>`
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.6px;margin-bottom:6px">CTP HOLE 18 · RYDER BONUS</div>
+                ${(STATE.ctpGroups || []).length
+                  ? (STATE.ctpGroups).map(g => `
+                      <div style="font-size:13px;font-weight:600;margin-bottom:3px">
+                        ${g.group}: ${cleanName(g.winner)}
+                        <span style="color:${g.team === 'Blue' ? '#1D4ED8' : '#DC2626'};margin-left:4px">
+                          +${g.blue > 0 ? g.blue : g.red} pt → ${g.team}
+                        </span>
+                      </div>`).join('')
                   : `<div style="font-size:12px;color:var(--t3)">Pending</div>`
                 }
               </div>
@@ -1427,7 +1418,7 @@ function renderRounds() {
     const c      = ctp[i]   || {};
     const scores = (STATE.roundScores || [])[i] || [];
     const hasDailyWinner = d.winner && d.winner !== '—';
-    const hasCTP = i === 2 && STATE.ryder.ctpWinner;
+    const hasCTP = i === 2 && STATE.ctpGroups && STATE.ctpGroups.length > 0;
 
     const scoreRows = scores.filter(p => p.net !== null).map((p, pi) => {
       const medal = pi === 0 ? '🥇' : pi === 1 ? '🥈' : pi === 2 ? '🥉' : pi + 1;
@@ -1440,10 +1431,11 @@ function renderRounds() {
             <span style="display:inline-block;width:6px;height:6px;border-radius:50%;
               background:${teamColor(p.team)};margin-left:5px;vertical-align:middle"></span>
           </div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-align:right">${p.net}</div>
-          <div class="scorecard-rank" style="font-size:10px;color:var(--t3);text-align:center">${p.rank ? '#' + p.rank : '—'}</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-align:right;color:var(--t2)">${p.score ?? '—'}</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-align:right">${p.net ?? '—'}</div>
+          <div style="font-size:12px;color:var(--t3);text-align:center">${p.rank ? '#' + p.rank : '—'}</div>
           <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold);text-align:right">
-            ${p.pts > 0 ? p.pts.toFixed(1) : '—'}
+            ${p.pts != null && p.pts > 0 ? p.pts.toFixed(1) : '—'}
           </div>
         </div>`;
     }).join('') || `<div style="padding:20px;text-align:center;color:var(--t3);font-size:12px">No scores entered yet</div>`;
@@ -1490,15 +1482,16 @@ function renderRounds() {
               <span style="font-size:10px;color:var(--t3)"> vs </span>
               <span style="color:#DC2626">${r.red.toFixed(1)}</span>
             </div>
-            ${hasCTP ? `<div style="font-size:10px;color:var(--g);margin-top:2px">⛳ CTP: ${STATE.ryder.ctpWinner} (+1 ${STATE.ryder.ctpTeam})</div>` : ''}
+            ${hasCTP ? STATE.ctpGroups.map(g => `<div style="font-size:12px;color:var(--g);margin-top:2px">⛳ ${g.group} CTP: ${cleanName(g.winner)} <span style="color:${g.team==='Blue'?'#1D4ED8':'#DC2626'}">+${g.blue>0?g.blue:g.red} ${g.team}</span></div>`).join('') : ''}
           </div>
         </div>
         <!-- Expandable scorecard -->
         <div id="round-scores-${i}" style="display:none">
           <div class="scorecard-hdr">
             <div></div><div>Player</div>
+            <div style="text-align:right">Score</div>
             <div style="text-align:right">Net</div>
-            <div class="scorecard-rank" style="text-align:center">Rank</div>
+            <div style="text-align:center">Rank</div>
             <div style="text-align:right">Pts</div>
           </div>
           ${scoreRows}
